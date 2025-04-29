@@ -1,67 +1,70 @@
 import SwiftUI
 
+// Joke arrays
+let goodJokes: [(question: String, punchline: String)] = [
+    ("What do you call fake spaghetti?", "An impasta."),
+    ("Why do programmers prefer dark mode?", "Because light attracts bugs!")
+]
+
+let punJokes: [(question: String, punchline: String)] = [
+    ("I'm reading a book on anti-gravity.", "It's impossible to put down!"),
+    ("I once heard a joke about amnesia.", "But I forgot how it goes.")
+]
+
+let dadJokes: [(question: String, punchline: String)] = [
+    ("I thought the dryer was shrinking my clothes.", "Turns out it was the refrigerator all along."),
+    ("I got carded at a liquor store.", "My Blockbuster card accidentally fell out. The cashier said never mind.")
+]
+
 struct JokeCardView: View {
     let jokeType: String
-    
-    let goodJokes: [(question: String, punchline: String)] = [
-        ("What do you call fake spaghetti?", "An impasta."),
-        ("Why don't scientists trust atoms?", "Because they make up everything!")
-    ]
-
-    let punJokes: [(question: String, punchline: String)] = [
-        ("I'm reading a book on anti-gravity.", "It's impossible to put down!"),
-        ("Did you hear about the guy who invented Lifesavers?", "He made a mint!")
-    ]
-
-    let dadJokes: [(question: String, punchline: String)] = [
-        ("Why did the scarecrow win an award?", "Because he was outstanding in his field!"),
-        ("Why can't you hear a pterodactyl go to the bathroom?", "Because the 'P' is silent!")
-    ]
 
     @State private var currentIndex = 0
-    @State private var isFlipped = false
-    
+    @State private var showingPunchline = false
+
     var jokes: [(question: String, punchline: String)] {
-        switch jokeType {
-        case "Good":
+        if jokeType.contains("Good") {
             return goodJokes
-        case "Pun":
+        }
+        else if jokeType.contains("Pun") {
             return punJokes
-        case "Dad":
+        }
+        else if jokeType.contains("Dad") {
             return dadJokes
-        default:
+        }
+        else {
             return []
         }
     }
-    
+
+    var displayedText: String {
+        return showingPunchline ? jokes[currentIndex].punchline : jokes[currentIndex].question
+    }
+
     var body: some View {
         VStack {
             Spacer()
 
-            // The flipping card
-            FlipCardView(
-                frontText: jokes[currentIndex].question,
-                backText: jokes[currentIndex].punchline,
-                isFlipped: $isFlipped
-            )
-
-            // No Spacer() here – keep button close to card
+            Text(displayedText)
+                .font(.title)
+                .multilineTextAlignment(.center)
+                .padding()
 
             Button(action: {
-                if isFlipped {
-                    // After seeing punchline, move to next joke
+                if showingPunchline {
                     currentIndex = (currentIndex + 1) % jokes.count
-                    isFlipped = false
-                } else {
-                    // Flip to show punchline
-                    isFlipped = true
+                    showingPunchline = false
                 }
-            }) {
-                Text("Next")
+                else {
+                    showingPunchline = true
+                }
+            })
+            {
+                Text(showingPunchline ? "Next" : "Flip")
                     .font(.headline)
                     .padding(.horizontal, 30)
                     .padding(.vertical, 12)
-                    .background(Color.blue)
+                    .background(Color(red: 195/255, green: 190/255, blue: 247/255))
                     .foregroundColor(.white)
                     .cornerRadius(12)
             }
@@ -70,11 +73,11 @@ struct JokeCardView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle(jokeType + " Jokes")
+        .navigationTitle(jokeType)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 #Preview {
-    JokeCardView(jokeType: "Pun")
+    ContentView()
 }
